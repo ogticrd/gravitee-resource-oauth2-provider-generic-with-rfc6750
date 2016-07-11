@@ -39,7 +39,7 @@
     },
     "tokenIsSuppliedByQueryParam" : {
       "title": "Token from HTTP query parameter",
-      "description": "Does the OAuth token is supplied using a query parameter ?",
+      "description": "Is the OAuth token supplied using a query parameter ?",
       "type" : "boolean",
       "default": true
     },
@@ -51,7 +51,7 @@
     },
     "tokenIsSuppliedByHttpHeader" : {
       "title": "Token from HTTP header",
-      "description": "Does the OAuth token is supplied using an HTTP header ?",
+      "description": "Is the OAuth token supplied using an HTTP header ?",
       "type" : "boolean",
       "default": false
     },
