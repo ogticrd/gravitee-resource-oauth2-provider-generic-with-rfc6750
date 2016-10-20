@@ -35,7 +35,7 @@
 
     <properties>
         <gravitee-resource-api.version>1.0.0-SNAPSHOT</gravitee-resource-api.version>
-        <async-http-client.version>2.0.18</async-http-client.version>
+        <async-http-client.version>2.0.15</async-http-client.version>
 
         <maven-assembly-plugin.version>2.5.5</maven-assembly-plugin.version>
     </properties>
