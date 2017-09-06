@@ -46,6 +46,10 @@ public class OAuth2ResourceConfiguration implements ResourceConfiguration {
 
     private String tokenHeaderName;
 
+    private boolean tokenIsSuppliedByFormUrlEncoded;
+
+    private String tokenFormUrlEncodedName;
+
     public String getIntrospectionEndpoint() {
         return introspectionEndpoint;
     }
@@ -132,5 +136,21 @@ public class OAuth2ResourceConfiguration implements ResourceConfiguration {
 
     public void setTokenHeaderName(String tokenHeaderName) {
         this.tokenHeaderName = tokenHeaderName;
+    }
+
+    public boolean isTokenIsSuppliedByFormUrlEncoded() {
+        return tokenIsSuppliedByFormUrlEncoded;
+    }
+
+    public void setTokenIsSuppliedByFormUrlEncoded(boolean tokenIsSuppliedByFormUrlEncoded) {
+        this.tokenIsSuppliedByFormUrlEncoded = tokenIsSuppliedByFormUrlEncoded;
+    }
+
+    public String getTokenFormUrlEncodedName() {
+        return tokenFormUrlEncodedName;
+    }
+
+    public void setTokenFormUrlEncodedName(String tokenFormUrlEncodedName) {
+        this.tokenFormUrlEncodedName = tokenFormUrlEncodedName;
     }
 }

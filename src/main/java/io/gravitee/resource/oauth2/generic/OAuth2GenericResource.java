@@ -119,9 +119,9 @@ public class OAuth2GenericResource extends OAuth2Resource<OAuth2ResourceConfigur
         logger.debug("Introspect access token by requesting {} [{}]", introspectionEndpointURI,
                 configuration.getIntrospectionEndpointMethod());
 
-        HttpClientRequest request = httpClient.request(
-                HttpMethod.valueOf(configuration.getIntrospectionEndpointMethod().toUpperCase()),
-                introspectionEndpointURI);
+        HttpMethod httpMethod = HttpMethod.valueOf(configuration.getIntrospectionEndpointMethod().toUpperCase());
+
+        HttpClientRequest request = httpClient.request(httpMethod, introspectionEndpointURI);
 
         if (configuration().isUseClientAuthorizationHeader()) {
             String authorizationHeader = configuration.getClientAuthorizationHeaderName();
@@ -156,7 +156,12 @@ public class OAuth2GenericResource extends OAuth2Resource<OAuth2ResourceConfigur
             responseHandler.handle(new OAuth2Response(false, event.getMessage()));
         });
 
-        request.end();
+        if (httpMethod == HttpMethod.POST && configuration.isTokenIsSuppliedByFormUrlEncoded()) {
+            request.headers().add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED);
+            request.end(configuration.getTokenFormUrlEncodedName() + '=' + accessToken);
+        } else {
+            request.end();
+        }
     }
 
     @Override
