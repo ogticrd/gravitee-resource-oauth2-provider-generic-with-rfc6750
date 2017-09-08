@@ -15,6 +15,8 @@
  */
 package io.gravitee.resource.oauth2.generic;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.gravitee.common.http.HttpHeaders;
 import io.gravitee.common.http.HttpStatusCode;
 import io.gravitee.common.http.MediaType;
@@ -34,6 +36,7 @@ import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
+import java.io.IOException;
 import java.net.URI;
 import java.util.Base64;
 import java.util.HashMap;
@@ -60,6 +63,8 @@ public class OAuth2GenericResource extends OAuth2Resource<OAuth2ResourceConfigur
     private HttpClientOptions httpClientOptions;
 
     private Vertx vertx;
+
+    private static final ObjectMapper MAPPER = new ObjectMapper();
 
     @Override
     protected void doStart() throws Exception {
@@ -145,7 +150,27 @@ public class OAuth2GenericResource extends OAuth2Resource<OAuth2ResourceConfigur
         request.handler(response -> response.bodyHandler(buffer -> {
             logger.debug("Introspection endpoint returns a response with a {} status code", response.statusCode());
             if (response.statusCode() == HttpStatusCode.OK_200) {
-                responseHandler.handle(new OAuth2Response(true, buffer.toString()));
+                // According to RFC 7662 : Note that a properly formed and authorized query for an inactive or
+                // otherwise invalid token (or a token the protected resource is not
+                // allowed to know about) is not considered an error response by this
+                // specification.  In these cases, the authorization server MUST instead
+                // respond with an introspection response with the "active" field set to
+                // "false" as described in Section 2.2.
+                String content = buffer.toString();
+
+                try {
+                    JsonNode introspectNode = MAPPER.readTree(content);
+                    JsonNode activeNode = introspectNode.get("active");
+                    if (activeNode != null) {
+                        boolean isActive = activeNode.asBoolean();
+                        responseHandler.handle(new OAuth2Response(isActive, content));
+                    } else {
+                        responseHandler.handle(new OAuth2Response(true, content));
+                    }
+                } catch (IOException e) {
+                    logger.error("Unable to validate introspection endpoint payload: {}", content);
+                    responseHandler.handle(new OAuth2Response(false, content));
+                }
             } else {
                 responseHandler.handle(new OAuth2Response(false, buffer.toString()));
             }
