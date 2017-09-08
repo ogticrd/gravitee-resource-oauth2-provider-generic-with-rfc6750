@@ -65,6 +65,18 @@
       "title": "HTTP header name",
       "description": "HTTP header used to supply access token.",
       "type" : "string"
+    },
+    "tokenIsSuppliedByFormUrlEncoded" : {
+      "title": "Use application/x-www-form-urlencoded form to send access token",
+      "description": "Send access token in application/x-www-form-urlencoded form.",
+      "type" : "boolean",
+      "default": false
+    },
+    "tokenFormUrlEncodedName" : {
+      "title": "Form param name",
+      "description": "Name of the form param in case of application/x-www-form-urlencoded.",
+      "type" : "string",
+      "default": "token"
     }
   },
   "required": [
