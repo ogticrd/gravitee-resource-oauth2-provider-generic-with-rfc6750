@@ -126,7 +126,7 @@ public class OAuth2GenericResource extends OAuth2Resource<OAuth2ResourceConfigur
 
         HttpMethod httpMethod = HttpMethod.valueOf(configuration.getIntrospectionEndpointMethod().toUpperCase());
 
-        HttpClientRequest request = httpClient.request(httpMethod, introspectionEndpointURI);
+        HttpClientRequest request = httpClient.requestAbs(httpMethod, introspectionEndpointURI);
 
         if (configuration().isUseClientAuthorizationHeader()) {
             String authorizationHeader = configuration.getClientAuthorizationHeaderName();
