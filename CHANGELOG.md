@@ -1,3 +1,11 @@
+## [2.0.2](https://github.com/gravitee-io/gravitee-resource-oauth2-provider-generic/compare/2.0.1...2.0.2) (2023-11-23)
+
+
+### Bug Fixes
+
+* use a throwable in the Oauth2Response on technical error for introspection ([4d3a54f](https://github.com/gravitee-io/gravitee-resource-oauth2-provider-generic/commit/4d3a54fc9a4ee00848f39264b4eacb3609f687a7))
+* use a throwable in the UserInfoResponse on technical error for userInfo ([58c635a](https://github.com/gravitee-io/gravitee-resource-oauth2-provider-generic/commit/58c635afebb04877a35f6acdb7022f7eefdd00af))
+
 ## [2.0.1](https://github.com/gravitee-io/gravitee-resource-oauth2-provider-generic/compare/2.0.0...2.0.1) (2023-10-03)
 
 
