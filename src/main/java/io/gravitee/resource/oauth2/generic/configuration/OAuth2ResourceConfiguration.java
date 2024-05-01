@@ -40,6 +40,10 @@ public class OAuth2ResourceConfiguration implements ResourceConfiguration {
 
     private String clientSecret;
 
+    private boolean useClientToken;
+
+    private String clientToken;
+
     private boolean useClientAuthorizationHeader;
 
     private String clientAuthorizationHeaderName;
@@ -92,6 +96,22 @@ public class OAuth2ResourceConfiguration implements ResourceConfiguration {
 
     public void setIntrospectionEndpointMethod(String introspectionEndpointMethod) {
         this.introspectionEndpointMethod = introspectionEndpointMethod;
+    }
+
+    public boolean getUseClientToken() {
+        return useClientToken;
+    }
+
+    public void setUseClientToken(boolean useClientToken) {
+        this.useClientToken = useClientToken;
+    }
+
+    public String getClientToken() {
+        return clientToken;
+    }
+
+    public void setClientToken(String clientToken) {
+        this.clientToken = clientToken;
     }
 
     public String getClientId() {

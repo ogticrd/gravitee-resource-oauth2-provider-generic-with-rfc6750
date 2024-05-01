@@ -138,7 +138,8 @@ public class OAuth2GenericResource extends OAuth2Resource<OAuth2ResourceConfigur
                 VertxProxyOptionsUtils.setSystemProxy(httpClientOptions, nodeConfig);
             } catch (IllegalStateException e) {
                 logger.warn(
-                    "OAuth2 resource requires a system proxy to be defined but some configurations are missing or not well defined: {}",
+                    "OAuth2 resource requires a system proxy to be defined but some " +
+                    "configurations are missing or not well defined: {}",
                     e.getMessage()
                 );
                 logger.warn("Ignoring system proxy");
@@ -196,13 +197,19 @@ public class OAuth2GenericResource extends OAuth2Resource<OAuth2ResourceConfigur
             String authorizationValue =
                 configuration.getClientAuthorizationHeaderScheme().trim() +
                 AUTHORIZATION_HEADER_SCHEME_SEPARATOR +
-                Base64
-                    .getEncoder()
-                    .encodeToString(
-                        (
-                            configuration.getClientId() + AUTHORIZATION_HEADER_VALUE_BASE64_SEPARATOR + configuration.getClientSecret()
-                        ).getBytes()
-                    );
+                (
+                    configuration().getUseClientToken()
+                        ? configuration().getClientToken()
+                        : Base64
+                            .getEncoder()
+                            .encodeToString(
+                                (
+                                    configuration.getClientId() +
+                                    AUTHORIZATION_HEADER_VALUE_BASE64_SEPARATOR +
+                                    configuration.getClientSecret()
+                                ).getBytes()
+                            )
+                );
             reqOptions.putHeader(authorizationHeader, authorizationValue);
             logger.debug("Set client authorization using HTTP header {} with value {}", authorizationHeader, authorizationValue);
         }
@@ -241,12 +248,15 @@ public class OAuth2GenericResource extends OAuth2Resource<OAuth2ResourceConfigur
                                             final HttpClientResponse response = asyncResponse.result();
                                             response.bodyHandler(buffer -> {
                                                 if (response.statusCode() == HttpStatusCode.OK_200) {
-                                                    // According to RFC 7662 : Note that a properly formed and authorized query for an inactive or
-                                                    // otherwise invalid token (or a token the protected resource is not
-                                                    // allowed to know about) is not considered an error response by this
-                                                    // specification.  In these cases, the authorization server MUST instead
-                                                    // respond with an introspection response with the "active" field set to
-                                                    // "false" as described in Section 2.2.
+                                                    // According to RFC 7662 : Note that a properly formed
+                                                    // and authorized query for an inactive or otherwise
+                                                    // invalid token (or a token the protected resource is
+                                                    // not allowed to know about) is not considered an
+                                                    // error response by this specification.  In these
+                                                    // cases, the authorization server MUST instead
+                                                    // respond with an introspection response with the
+                                                    // "active" field set to "false" as described in
+                                                    // Section 2.2.
                                                     String content = buffer.toString();
 
                                                     try {
@@ -259,18 +269,22 @@ public class OAuth2GenericResource extends OAuth2Resource<OAuth2ResourceConfigur
                                                             responseHandler.handle(new OAuth2Response(true, content));
                                                         }
                                                     } catch (IOException e) {
-                                                        logger.error("Unable to validate introspection endpoint payload: {}", content, e);
+                                                        logger.error(
+                                                            "Unable to validate introspection " + "endpoint payload: {}",
+                                                            content,
+                                                            e
+                                                        );
                                                         responseHandler.handle(new OAuth2Response(e));
                                                     }
                                                 } else {
                                                     logger.error(
-                                                        "An error occurs while checking OAuth2 token. Request ends with status {}: {}",
+                                                        "An error occurs while checking OAuth2 token. " + "Request ends with status {}: {}",
                                                         response.statusCode(),
                                                         buffer.toString()
                                                     );
                                                     responseHandler.handle(
                                                         new OAuth2Response(
-                                                            new OAuth2ResourceException("An error occurs while checking OAuth2 token")
+                                                            new OAuth2ResourceException("An error occurs while checking OAuth2 " + "token")
                                                         )
                                                     );
                                                 }
@@ -339,13 +353,16 @@ public class OAuth2GenericResource extends OAuth2Resource<OAuth2ResourceConfigur
                                     @Override
                                     public void handle(AsyncResult<HttpClientResponse> asyncResponse) {
                                         if (asyncResponse.failed()) {
-                                            logger.error("An error occurs while getting userinfo from access token", asyncResponse.cause());
+                                            logger.error(
+                                                "An error occurs while getting userinfo " + "from access token",
+                                                asyncResponse.cause()
+                                            );
                                             responseHandler.handle(new UserInfoResponse(asyncResponse.cause()));
                                         } else {
                                             final HttpClientResponse response = asyncResponse.result();
                                             response.bodyHandler(buffer -> {
                                                 logger.debug(
-                                                    "Userinfo endpoint returns a response with a {} status code",
+                                                    "Userinfo endpoint returns a response " + "with a {} status code",
                                                     response.statusCode()
                                                 );
 
@@ -353,14 +370,16 @@ public class OAuth2GenericResource extends OAuth2Resource<OAuth2ResourceConfigur
                                                     responseHandler.handle(new UserInfoResponse(true, buffer.toString()));
                                                 } else {
                                                     logger.error(
-                                                        "An error occurs while getting userinfo from access token. Request ends with status {}: {}",
+                                                        "An error occurs while getting userinfo from " +
+                                                        "access token. Request ends with status " +
+                                                        "{}: {}",
                                                         response.statusCode(),
                                                         buffer.toString()
                                                     );
                                                     responseHandler.handle(
                                                         new UserInfoResponse(
                                                             new OAuth2ResourceException(
-                                                                "An error occurs while getting userinfo from access token"
+                                                                "An error occurs while getting userinfo " + "from access token"
                                                             )
                                                         )
                                                     );
@@ -374,7 +393,7 @@ public class OAuth2GenericResource extends OAuth2Resource<OAuth2ResourceConfigur
                                 new io.vertx.core.Handler<Throwable>() {
                                     @Override
                                     public void handle(Throwable event) {
-                                        logger.error("An error occurs while getting userinfo from access token", event);
+                                        logger.error("An error occurs while getting userinfo " + "from access token", event);
                                         responseHandler.handle(new UserInfoResponse(event));
                                     }
                                 }
